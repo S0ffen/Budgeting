@@ -17,13 +17,13 @@ const users = [
 
 export default function Sidebar({ onSelectUser }: SidebarProps) {
   return (
-    <aside className="w-60 h-full bg-white border-r border-black p-4 overflow-y-auto">
-      <h2 className="text-xl font-bold mb-4 border-b pb-2">Users3</h2>
+    <aside className="w-60 h-full bg-purple-300 border-r border-black p-4 overflow-y-auto">
+      <h2 className="m-4 text-xl font-bold mb-4 border-b pb-2">Users</h2>
       <ul className="space-y-2">
         {users.map((user, idx) => (
           <li
             key={idx}
-            className="p-2 rounded hover:bg-gray-200 transition cursor-pointer text-sm font-medium"
+            className="m-2 p-2 rounded hover:bg-purple-200 transition cursor-pointer text-sm font-medium"
             onClick={() => onSelectUser(user)}
           >
             {user}
