@@ -1,10 +1,8 @@
-/*
-  Finalny MainContent: wybór użytkownika z listy (prop), wpisanie danych (tytuł, kwota, data = dzisiaj) i dodanie do tabeli poniżej
-*/
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 
 interface Transaction {
   user: string;
@@ -24,16 +22,59 @@ export default function MainContent({ selectedUser }: MainContentProps) {
 
   const today = new Date().toISOString().split("T")[0];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 📥 Fetch na start
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const { data, error } = await supabase.from("Objects").select();
+
+      if (error) {
+        console.error("Fetch error:", error);
+      } else {
+        const parsed = data.map((item: any) => ({
+          user: item.user,
+          title: item.title,
+          amount: item.amount,
+          date: item.created_at?.split("T")[0] || "",
+        }));
+        setTransactions(parsed);
+      }
+
+      console.log("Fetched transactions:", data);
+      console.log("Supabase fetch error:", error);
+      console.log("Supabase fetched data:", data);
+
+      console.log("Parsed transactions:", transactions);
+    };
+
+    fetchTransactions();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUser || !title || !amount) return;
-    const newTransaction: Transaction = {
-      user: selectedUser,
-      title,
-      amount: parseFloat(amount),
-      date: today,
-    };
-    setTransactions([...transactions, newTransaction]);
+
+    const { data, error } = await supabase.from("Objects").insert([
+      {
+        user: selectedUser,
+        title,
+        amount: parseFloat(amount),
+      },
+    ]);
+    if (error) {
+      console.error("Insert error:", error);
+      return;
+    }
+
+    setTransactions((prev) => [
+      ...prev,
+      {
+        user: selectedUser,
+        title,
+        amount: parseFloat(amount),
+        date: today,
+      },
+    ]);
+
     setTitle("");
     setAmount("");
   };
@@ -70,13 +111,13 @@ export default function MainContent({ selectedUser }: MainContentProps) {
             className="bg-blue-200 border border-black p-2 rounded"
           />
         </div>
-        <button
+        <Button
           type="submit"
           disabled={!selectedUser}
-          className="px-4 py-2 bg-blue-400 text-black rounded disabled:opacity-50"
+          className="rounded disabled:opacity-50"
         >
           Add Transaction
-        </button>
+        </Button>
       </form>
 
       <h2 className="text-lg font-bold mt-8 mb-2">Transactions</h2>
