@@ -8,7 +8,7 @@ interface Transaction {
   user: string;
   title: string;
   amount: number;
-  date: string;
+  created_at: string;
 }
 
 interface MainContentProps {
@@ -30,11 +30,11 @@ export default function MainContent({ selectedUser }: MainContentProps) {
       if (error) {
         console.error("Fetch error:", error);
       } else {
-        const parsed = data.map((item: any) => ({
+        const parsed = data.map((item: Transaction) => ({
           user: item.user,
           title: item.title,
           amount: item.amount,
-          date: item.created_at?.split("T")[0] || "",
+          created_at: item.created_at?.split("T")[0] || "",
         }));
         setTransactions(parsed);
       }
@@ -72,7 +72,7 @@ export default function MainContent({ selectedUser }: MainContentProps) {
         user: selectedUser,
         title,
         amount: parseFloat(amount),
-        date: today,
+        created_at: today,
       },
     ]);
 
@@ -137,7 +137,7 @@ export default function MainContent({ selectedUser }: MainContentProps) {
               <td className="p-2 border">{tx.user}</td>
               <td className="p-2 border">{tx.title}</td>
               <td className="p-2 border">{tx.amount.toFixed(2)}</td>
-              <td className="p-2 border">{tx.date}</td>
+              <td className="p-2 border">{tx.created_at}</td>
             </tr>
           ))}
         </tbody>
