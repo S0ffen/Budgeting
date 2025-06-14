@@ -64,6 +64,7 @@ export default function MainContent({ selectedUser }: MainContentProps) {
       console.error("Insert error:", error);
       return;
     }
+    console.log("Inserted transaction:", data);
 
     setTransactions((prev) => [
       ...prev,
