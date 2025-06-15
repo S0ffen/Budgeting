@@ -20,7 +20,8 @@ export default function MainContent({ selectedUser }: MainContentProps) {
   const [amount, setAmount] = useState("");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
+  console.log("Today's date:", today);
 
   // 📥 Fetch na start
   useEffect(() => {
@@ -58,6 +59,7 @@ export default function MainContent({ selectedUser }: MainContentProps) {
         user: selectedUser,
         title,
         amount: parseFloat(amount),
+        created_at: today,
       },
     ]);
     if (error) {
@@ -137,7 +139,7 @@ export default function MainContent({ selectedUser }: MainContentProps) {
               <td className="p-2 border">{tx.user}</td>
               <td className="p-2 border">{tx.title}</td>
               <td className="p-2 border">{tx.amount.toFixed(2)}</td>
-              <td className="p-2 border">{tx.created_at}</td>
+              <td>{tx.created_at.split("T")[0]}</td>
             </tr>
           ))}
         </tbody>
