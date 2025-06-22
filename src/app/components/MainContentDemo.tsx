@@ -59,9 +59,9 @@ export default function MainContentDemo({ list }: { list: string }) {
       <header className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">List: {list}</h2>
         <nav className="flex gap-6 text-gray-600 font-medium">
-          <a href="#">Home</a>
-          <a href="#">Create List</a>
-          <a href="#">About us</a>
+          <a href="#">Support</a>
+          <a href="#">Language</a>
+          <a href="#">Nightmode</a>
         </nav>
       </header>
 

@@ -20,10 +20,10 @@ export default function UserSidebarDemo({
 }) {
   const [lists, setLists] = useState<string[]>([]);
   const [newListName, setNewListName] = useState("");
-  const [open, setOpen] = useState(false);
+  const [openCreate, setOpenCreate] = useState(false);
+  const [openLogout, setOpenLogout] = useState(false);
   const user = "sophia_0345";
 
-  // Wczytaj listy przy starcie i każdej zmianie localStorage
   const loadLists = () => {
     const raw = localStorage.getItem("demo_lists");
     const parsed = raw ? JSON.parse(raw) : [];
@@ -44,10 +44,15 @@ export default function UserSidebarDemo({
 
     const updated = [...existing, name];
     localStorage.setItem("demo_lists", JSON.stringify(updated));
-    setLists(updated); // aktualizacja widoku
-    onSelectList(name); // aktywuj nową listę
+    setLists(updated);
+    onSelectList(name);
     setNewListName("");
-    setOpen(false);
+    setOpenCreate(false);
+  };
+
+  const logout = () => {
+    console.log("Użytkownik wylogowany");
+    setOpenLogout(false);
   };
 
   return (
@@ -60,13 +65,15 @@ export default function UserSidebarDemo({
           <div className="text-sm text-gray-500">@{user}</div>
         </div>
 
-        <h3 className="font-bold mb-2 text-gray-700">Lists</h3>
-        <div className="flex flex-col gap-2">
+        <h3 className="text-xl font-bold mb-3 text-gray-800 tracking-wide">
+          Lists
+        </h3>
+        <div className="flex flex-col gap-2 mb-4">
           {lists.map((list) => (
             <button
               key={list}
               onClick={() => onSelectList(list)}
-              className={`w-full px-4 py-2 rounded-full font-medium transition ${
+              className={`w-full px-4 py-2 rounded-full font-medium transition-transform duration-200 ease-in-out transform hover:scale-[1.03] ${
                 selectedList === list
                   ? "bg-gray-800 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -76,29 +83,71 @@ export default function UserSidebarDemo({
             </button>
           ))}
         </div>
+
+        {/* Nowy przycisk pod listami */}
+        <button
+          onClick={() => alert("Import clicked!")}
+          className="w-full bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-medium py-2 rounded-full transition-transform duration-200 ease-in-out transform hover:scale-[1.03]"
+        >
+          Create new list
+        </button>
       </div>
 
-      {/* bottom */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <button className="bg-teal-100 hover:bg-teal-200 text-teal-800 font-medium py-2 mt-6 rounded-full w-full">
-            Create new list
-          </button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create new list</DialogTitle>
-          </DialogHeader>
-          <Input
-            placeholder="List name"
-            value={newListName}
-            onChange={(e) => setNewListName(e.target.value)}
-          />
-          <DialogFooter className="mt-4">
-            <Button onClick={() => addList(newListName)}>Create</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* bottom buttons */}
+      <div className="flex flex-col gap-2 mt-6">
+        {/* Create List Modal */}
+        <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+          <DialogTrigger asChild>
+            <button className="bg-teal-100 hover:bg-teal-200 text-teal-800 font-medium py-2 rounded-full w-full transition-transform duration-200 ease-in-out transform hover:scale-105">
+              Support
+            </button>
+          </DialogTrigger>
+          <DialogContent className="flex flex-col justify-between">
+            <DialogHeader>
+              <DialogTitle>Support</DialogTitle>
+            </DialogHeader>
+            <Input
+              placeholder="List name"
+              value={newListName}
+              onChange={(e) => setNewListName(e.target.value)}
+            />
+            <DialogFooter className="flex flex-col gap-2">
+              <Button onClick={() => addList(newListName)} className="w-full">
+                Create
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Logout Modal */}
+        <Dialog open={openLogout} onOpenChange={setOpenLogout}>
+          <DialogTrigger asChild>
+            <button className="bg-red-100 hover:bg-red-200 text-red-800 font-medium py-2 rounded-full w-full transition-transform duration-200 ease-in-out transform hover:scale-105">
+              Logout
+            </button>
+          </DialogTrigger>
+          <DialogContent className="flex flex-col justify-between">
+            <DialogHeader>
+              <DialogTitle>Are you sure you want to log out?</DialogTitle>
+            </DialogHeader>
+            <DialogFooter className="flex flex-col gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setOpenLogout(false)}
+                className="w-full"
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-red-500 hover:bg-red-600 w-full"
+                onClick={logout}
+              >
+                Logout
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </aside>
   );
 }
