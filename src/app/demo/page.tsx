@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import UserSidebarDemo from "../components/UserSidebarDemo";
-import MainContentDemo from "../components/MainContentDemo";
+import UserSidebarDemo from "./components/UserSidebarDemo";
+import MainContentDemo from "./components/MainContentDemo";
 
 export default function Demo() {
   const [selectedList, setSelectedList] = useState("Friends");
