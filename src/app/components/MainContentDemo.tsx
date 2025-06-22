@@ -72,6 +72,9 @@ export default function MainContentDemo({ list }: { list: string }) {
         <button className="w-1/2 text-center py-2 text-gray-500">
           Expenses
         </button>
+        <button className="w-1/2 text-center py-2 text-gray-500">
+          Options
+        </button>
       </div>
 
       <div className="space-y-4 mb-8">
