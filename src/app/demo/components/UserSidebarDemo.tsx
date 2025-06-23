@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import SupportForm from "@/app/demo/SupportForm";
+import SupportForm from "./SupportForm";
 import {
   Dialog,
   DialogTrigger,
@@ -34,7 +34,9 @@ export default function UserSidebarDemo({
   const addList = (name: string) => {
     if (!name.trim()) return;
 
-    const existing: string[] = JSON.parse(localStorage.getItem("demo_lists") || "[]");
+    const existing: string[] = JSON.parse(
+      localStorage.getItem("demo_lists") || "[]"
+    );
     if (existing.includes(name)) return;
 
     const updated = [...existing, name];
@@ -59,7 +61,9 @@ export default function UserSidebarDemo({
           <div className="text-sm text-gray-500">@{user}</div>
         </div>
 
-        <h3 className="text-xl font-bold mb-3 text-gray-800 tracking-wide">Lists</h3>
+        <h3 className="text-xl font-bold mb-3 text-gray-800 tracking-wide">
+          Lists
+        </h3>
         <div className="flex flex-col gap-2 mb-4">
           {lists.map((list) => (
             <button
@@ -126,10 +130,17 @@ export default function UserSidebarDemo({
               <DialogTitle>Are you sure you want to log out?</DialogTitle>
             </DialogHeader>
             <DialogFooter className="flex flex-col gap-2">
-              <Button variant="ghost" onClick={() => setOpenLogout(false)} className="w-full">
+              <Button
+                variant="ghost"
+                onClick={() => setOpenLogout(false)}
+                className="w-full"
+              >
                 Cancel
               </Button>
-              <Button className="bg-red-500 hover:bg-red-600 w-full" onClick={logout}>
+              <Button
+                className="bg-red-500 hover:bg-red-600 w-full"
+                onClick={logout}
+              >
                 Logout
               </Button>
             </DialogFooter>

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "motion/react";
 
 interface Transaction {
   title: string;
@@ -43,6 +44,7 @@ const InfoPanel: FC<InfoPanelProps> = ({
   const [selectedUser, setSelectedUser] = useState("");
   const [isUserOwesMe, setIsUserOwesMe] = useState(true);
   const [users, setUsers] = useState<string[]>([]);
+  const [involvesOtherUser, setInvolvesOtherUser] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem("demo_list_data");
@@ -68,15 +70,20 @@ const InfoPanel: FC<InfoPanelProps> = ({
   const handleAdd = () => {
     if (!newTitle.trim() || !newAmount.trim()) return;
 
-    const targetUser = selectedUser || currentUser;
-    const forUser = isUserOwesMe ? targetUser : currentUser;
-    const addedBy = isUserOwesMe ? currentUser : targetUser;
+    let forUser = currentUser;
+    let addedBy = currentUser;
+
+    if (involvesOtherUser && selectedUser.trim()) {
+      forUser = isUserOwesMe ? selectedUser : currentUser;
+      addedBy = isUserOwesMe ? currentUser : selectedUser;
+    }
 
     onAddTransaction(newTitle, parseFloat(newAmount), forUser, addedBy);
 
     setNewTitle("");
     setNewAmount("");
     setSelectedUser(users[0] || "");
+    setInvolvesOtherUser(false);
     setIsUserOwesMe(true);
     setShowAdd(false);
   };
@@ -93,7 +100,8 @@ const InfoPanel: FC<InfoPanelProps> = ({
             <div>
               <div className="font-semibold">{tx.title}</div>
               <div className="text-sm text-gray-500">
-                {tx.date} • {tx.addedBy} → {tx.forUser}
+                {tx.date} • {tx.addedBy}
+                {tx.addedBy !== tx.forUser && ` → ${tx.forUser}`}
               </div>
             </div>
           </div>
@@ -140,32 +148,60 @@ const InfoPanel: FC<InfoPanelProps> = ({
             <label className="flex items-center gap-2 mb-2">
               <input
                 type="checkbox"
-                checked={isUserOwesMe}
-                onChange={(e) => setIsUserOwesMe(e.target.checked)}
+                checked={involvesOtherUser}
+                onChange={(e) => setInvolvesOtherUser(e.target.checked)}
                 disabled={users.length === 0}
               />
-              {isUserOwesMe ? "Selected user owes me" : "I owe selected user"}
+              This involves another user
             </label>
 
-            {users.length > 0 ? (
-              <select
-                value={selectedUser}
-                onChange={(e) => setSelectedUser(e.target.value)}
-                className="w-full border rounded px-3 py-2 mb-4"
-              >
-                {users.map((u) => (
-                  <option key={u} value={u}>
-                    {u}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <Input
-                placeholder="(optional) User name"
-                value={selectedUser}
-                onChange={(e) => setSelectedUser(e.target.value)}
-                className="mb-4"
-              />
+            {involvesOtherUser && (
+              <>
+                <div className="relative flex items-center justify-center gap-24 mb-4 h-10">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={isUserOwesMe ? "pink-left" : "pink-right"}
+                      initial={{ x: isUserOwesMe ? -80 : 80, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: isUserOwesMe ? 80 : -80, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={`absolute ${
+                        isUserOwesMe ? "left-0" : "right-0"
+                      } w-10 h-10 bg-pink-300 rounded-full`}
+                    />
+                  </AnimatePresence>
+                  <button
+                    className="z-10 text-sm underline"
+                    onClick={() => setIsUserOwesMe((prev) => !prev)}
+                  >
+                    Swap
+                  </button>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={!isUserOwesMe ? "blue-left" : "blue-right"}
+                      initial={{ x: !isUserOwesMe ? -80 : 80, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: !isUserOwesMe ? 80 : -80, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={`absolute ${
+                        !isUserOwesMe ? "left-0" : "right-0"
+                      } w-10 h-10 bg-blue-300 rounded-full`}
+                    />
+                  </AnimatePresence>
+                </div>
+
+                <select
+                  value={selectedUser}
+                  onChange={(e) => setSelectedUser(e.target.value)}
+                  className="w-full border rounded px-3 py-2 mb-4"
+                >
+                  {users.map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
+                </select>
+              </>
             )}
 
             <Button
