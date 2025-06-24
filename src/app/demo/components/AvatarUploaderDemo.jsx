@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 
 const AvatarUploader = () => {
   const fileInputRef = useRef(null);
@@ -18,10 +18,10 @@ const AvatarUploader = () => {
       reader.readAsDataURL(file);
 
       const formData = new FormData();
-      formData.append('avatar', file);
+      formData.append("avatar", file);
 
-      await fetch('/api/upload-avatar', {
-        method: 'POST',
+      await fetch("/api/upload-avatar", {
+        method: "POST",
         body: formData,
       });
     }
@@ -33,7 +33,7 @@ const AvatarUploader = () => {
         className="w-20 h-20 rounded-full bg-gray-200 cursor-pointer bg-cover bg-center"
         onClick={handleClick}
         style={{
-          backgroundImage: preview ? `url(${preview})` : 'none',
+          backgroundImage: preview ? `url(${preview})` : "none",
         }}
       >
         {!preview && (

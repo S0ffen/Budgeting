@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
+import { Trash2 } from "lucide-react";
 
 interface OptionsPanelProps {
   list: string;
@@ -12,7 +14,6 @@ interface ListData {
   transactions: any[];
 }
 
-// Stała lista dostępnych użytkowników (demo)
 const AVAILABLE_USERS = ["Alice", "Bob", "Charlie", "Diana", "Edward", "Fiona"];
 
 export default function OptionsPanelDemo({ list }: OptionsPanelProps) {
@@ -58,50 +59,61 @@ export default function OptionsPanelDemo({ list }: OptionsPanelProps) {
     setSelectedUser("");
   };
 
+  const removeUser = (u: string) => {
+    const raw = localStorage.getItem("demo_list_data") || "{}";
+    const all = JSON.parse(raw);
+    const current = all[list];
+    if (!current) return;
+
+    current.users = current.users.filter((user: string) => user !== u);
+    all[list] = current;
+    localStorage.setItem("demo_list_data", JSON.stringify(all));
+    setUsers(current.users);
+  };
+
   return (
-    <div className="space-y-6">
-      <h3 className="text-xl font-semibold">
-        Users in list: <span className="text-gray-800">{list}</span>
+    <div className="space-y-6 max-w-xl p-6 mx-auto">
+      <h3 className="text-2xl font-bold tracking-tight text-gray-800">
+        Użytkownicy listy: <span className="text-blue-600">{list}</span>
       </h3>
 
-      {users.length > 0 ? (
-        <ul className="list-disc list-inside text-gray-700">
-          {users.map((u) => (
-            <li key={u} className="flex justify-between items-center">
-              <span>{u}</span>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => {
-                  const raw = localStorage.getItem("demo_list_data") || "{}";
-                  const all = JSON.parse(raw);
-                  const current = all[list];
-                  if (!current) return;
+      <div className="bg-white shadow rounded-lg p-4">
+        {users.length > 0 ? (
+          <ul className="space-y-2">
+            <AnimatePresence>
+              {users.map((u) => (
+                <motion.li
+                  key={u}
+                  className="flex justify-between items-center bg-gray-50 px-4 py-2 rounded-md border"
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                >
+                  <span className="font-medium text-gray-700">{u}</span>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => removeUser(u)}
+                  >
+                    <Trash2 size={16} className="mr-1" />
+                    Usuń
+                  </Button>
+                </motion.li>
+              ))}
+            </AnimatePresence>
+          </ul>
+        ) : (
+          <p className="text-gray-500 italic">Brak użytkowników.</p>
+        )}
+      </div>
 
-                  current.users = current.users.filter(
-                    (user: string) => user !== u
-                  );
-                  all[list] = current;
-                  localStorage.setItem("demo_list_data", JSON.stringify(all));
-                  setUsers(current.users);
-                }}
-              >
-                Usuń
-              </Button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-gray-500 italic">No users yet.</p>
-      )}
-
-      <div className="flex gap-2 items-center">
-        <select 
-          className="border px-3 py-2 rounded"
+      <div className="flex items-center gap-3">
+        <select
+          className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={selectedUser}
           onChange={(e) => setSelectedUser(e.target.value)}
         >
-          <option value="">-- Select user --</option>
+          <option value="">-- Wybierz użytkownika --</option>
           {AVAILABLE_USERS.filter((u) => !users.includes(u)).map((u) => (
             <option key={u} value={u}>
               {u}
@@ -109,7 +121,7 @@ export default function OptionsPanelDemo({ list }: OptionsPanelProps) {
           ))}
         </select>
         <Button onClick={addUser} disabled={!selectedUser}>
-          Add
+          Dodaj
         </Button>
       </div>
     </div>

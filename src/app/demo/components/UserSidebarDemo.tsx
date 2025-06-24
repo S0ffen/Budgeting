@@ -30,20 +30,33 @@ export default function UserSidebarDemo({
   useEffect(() => {
     const raw = localStorage.getItem("demo_lists");
     const parsed = raw ? JSON.parse(raw) : [];
-    setLists(parsed);
+    console.log("Raw lists from localStorage:", raw);
+    console.log("Parsed lists from localStorage:", parsed);
+    const names = Object.keys(parsed); // ["DemoList", "test1", ...]
+    console.log("Loaded lists from localStorage:", names);
+    setLists(names);
   }, []);
-  
+
   const addList = (name: string) => {
     if (!name.trim()) return;
 
-    const existing: string[] = JSON.parse(
-      localStorage.getItem("demo_lists") || "[]"
-    );
-    if (existing.includes(name)) return;
+    const existing = JSON.parse(localStorage.getItem("demo_lists") || "{}");
 
-    const updated = [...existing, name];
+    // upewnij się że to obiekt
+    if (typeof existing !== "object" || Array.isArray(existing)) return;
+
+    if (Object.keys(existing).includes(name)) return;
+
+    const updated = {
+      ...existing,
+      [name]: {
+        users: [],
+        transactions: [],
+      },
+    };
+
     localStorage.setItem("demo_lists", JSON.stringify(updated));
-    setLists(updated);
+    setLists(Object.keys(updated));
     onSelectList(name);
     setNewListName("");
     setOpenCreate(false);
@@ -55,43 +68,44 @@ export default function UserSidebarDemo({
   };
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-
   return (
     <aside className="w-72 p-6 bg-white border-r border-gray-200 flex flex-col justify-between">
       <div>
         <div className="flex flex-col items-center gap-2 mb-8">
           <div>
-          <input
-            id="avatar-upload"
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                  setAvatarPreview(reader.result as string);
-                };
-                reader.readAsDataURL(file);
-              }
-            }}
-            className="hidden"
-          />
-          <label htmlFor="avatar-upload">
-            <div
-              className="w-20 h-20 rounded-full bg-gray-200 cursor-pointer bg-cover bg-center"
-              style={{
-                backgroundImage: avatarPreview ? `url(${avatarPreview})` : "none",
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    setAvatarPreview(reader.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                }
               }}
-            >
-              {!avatarPreview && (
-                <div className="flex items-center justify-center w-full h-full text-xs text-gray-500">
-                  Add avatar
-                </div>
-              )}
-            </div>
-          </label>
-        </div>
+              className="hidden"
+            />
+            <label htmlFor="avatar-upload">
+              <div
+                className="w-20 h-20 rounded-full bg-gray-200 cursor-pointer bg-cover bg-center"
+                style={{
+                  backgroundImage: avatarPreview
+                    ? `url(${avatarPreview})`
+                    : "none",
+                }}
+              >
+                {!avatarPreview && (
+                  <div className="flex items-center justify-center w-full h-full text-xs text-gray-500">
+                    Add avatar
+                  </div>
+                )}
+              </div>
+            </label>
+          </div>
           <div className="text-lg font-semibold">Sophia Bennet</div>
           <div className="text-sm text-gray-500">@{user}</div>
         </div>

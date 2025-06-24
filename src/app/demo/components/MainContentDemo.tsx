@@ -20,9 +20,21 @@ export default function MainContentDemo({ list }: { list: string }) {
   const STORAGE_KEY = `demo_transactions_${list}`;
 
   useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    setTransactions(parsed);
+    const raw = localStorage.getItem("demo_lists");
+    if (!raw) return;
+
+    try {
+      const all = JSON.parse(raw);
+      const current = all[list];
+      if (current && Array.isArray(current.transactions)) {
+        setTransactions(current.transactions);
+      } else {
+        setTransactions([]);
+      }
+    } catch (err) {
+      console.error("Failed to load transactions:", err);
+      setTransactions([]);
+    }
   }, [list]);
 
   const addTransaction = (
@@ -31,6 +43,10 @@ export default function MainContentDemo({ list }: { list: string }) {
     forUser: string,
     addedBy: string
   ) => {
+    const raw = localStorage.getItem("demo_lists") || "{}";
+    const all = JSON.parse(raw);
+    const current = all[list] || { users: [], transactions: [] };
+
     const newTx: Transaction = {
       title,
       amount,
@@ -40,9 +56,11 @@ export default function MainContentDemo({ list }: { list: string }) {
       date: new Date().toISOString().split("T")[0],
     };
 
-    const updated = [...transactions, newTx];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    setTransactions(updated);
+    current.transactions.unshift(newTx); // dodaj na początek
+    all[list] = current;
+
+    localStorage.setItem("demo_lists", JSON.stringify(all));
+    setTransactions(current.transactions);
   };
 
   return (
