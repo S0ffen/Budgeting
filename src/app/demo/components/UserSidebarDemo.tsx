@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import SupportForm from "@/app/demo/SupportForm";
+import SupportForm from "@/app/demo/components/SupportFormDemo";
 import {
   Dialog,
   DialogTrigger,
@@ -30,7 +30,7 @@ export default function UserSidebarDemo({
     const parsed = raw ? JSON.parse(raw) : [];
     setLists(parsed);
   }, []);
-
+  
   const addList = (name: string) => {
     if (!name.trim()) return;
 
@@ -49,12 +49,45 @@ export default function UserSidebarDemo({
     console.log("Użytkownik wylogowany");
     setOpenLogout(false);
   };
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
 
   return (
     <aside className="w-72 p-6 bg-white border-r border-gray-200 flex flex-col justify-between">
       <div>
         <div className="flex flex-col items-center gap-2 mb-8">
-          <div className="w-20 h-20 bg-gray-300 rounded-full" />
+          <div>
+          <input
+            id="avatar-upload"
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  setAvatarPreview(reader.result as string);
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+            className="hidden"
+          />
+          <label htmlFor="avatar-upload">
+            <div
+              className="w-20 h-20 rounded-full bg-gray-200 cursor-pointer bg-cover bg-center"
+              style={{
+                backgroundImage: avatarPreview ? `url(${avatarPreview})` : "none",
+              }}
+            >
+              {!avatarPreview && (
+                <div className="flex items-center justify-center w-full h-full text-xs text-gray-500">
+                  Add avatar
+                </div>
+              )}
+            </div>
+          </label>
+        </div>
           <div className="text-lg font-semibold">Sophia Bennet</div>
           <div className="text-sm text-gray-500">@{user}</div>
         </div>

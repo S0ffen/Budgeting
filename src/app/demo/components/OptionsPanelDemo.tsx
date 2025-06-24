@@ -96,7 +96,7 @@ export default function OptionsPanelDemo({ list }: OptionsPanelProps) {
       )}
 
       <div className="flex gap-2 items-center">
-        <select
+        <select 
           className="border px-3 py-2 rounded"
           value={selectedUser}
           onChange={(e) => setSelectedUser(e.target.value)}
