@@ -8,6 +8,7 @@ import ExpensesPanel from "./ExpensesPanelDemo";
 interface Transaction {
   title: string;
   addedBy: string;
+  forUser: string; // ⬅️ dodaj to pole!
   amount: number;
   type: "REQUIREMENT" | "REPAYMENT";
   date: string;
@@ -24,11 +25,17 @@ export default function MainContentDemo({ list }: { list: string }) {
     setTransactions(parsed);
   }, [list]);
 
-  const addTransaction = (title: string, amount: number) => {
+  const addTransaction = (
+    title: string,
+    amount: number,
+    forUser: string,
+    addedBy: string
+  ) => {
     const newTx: Transaction = {
       title,
-      addedBy: "Sophia",
       amount,
+      forUser,
+      addedBy,
       type: "REQUIREMENT",
       date: new Date().toISOString().split("T")[0],
     };
