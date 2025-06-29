@@ -4,7 +4,7 @@ import UserSidebarDemo from "./components/UserSidebarDemo";
 import MainContentDemo from "./components/MainContentDemo";
 
 export default function Demo() {
-  const [selectedList, setSelectedList] = useState("Friends");
+  const [selectedList, setSelectedList] = useState("DemoList");
   // Inicjalizacja danych demo
   useEffect(() => {
     const raw = localStorage.getItem("demo_lists");
