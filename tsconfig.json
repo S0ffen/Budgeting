@@ -27,7 +27,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/demo/components/AvatarUploaderDemo.jsx"
+    "src/app/demo/components/AvatarUploaderDemo.tsx"
   ],
   "exclude": ["node_modules"]
 }
