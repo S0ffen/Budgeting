@@ -71,13 +71,24 @@ export default function OptionsPanelDemo({ list }: OptionsPanelProps) {
     setUsers(current.users);
   };
 
-  return (
-    <div className="space-y-6 max-w-xl p-6 mx-auto">
-      <h3 className="text-2xl font-bold tracking-tight text-gray-800">
-        Użytkownicy listy: <span className="text-blue-600">{list}</span>
-      </h3>
+  const deleteList = () => {
+    const raw = localStorage.getItem("demo_list_data") || "{}";
+    const all: Record<string, ListData> = JSON.parse(raw);
 
-      <div className="bg-white shadow rounded-lg p-4">
+    if (all[list]) {
+      delete all[list];
+      localStorage.setItem("demo_list_data", JSON.stringify(all));
+      setUsers([]);
+      setSelectedUser("");
+    }
+  };
+
+  return (
+    <div className="space-y-6 max-w-xl p-6 flex">
+      <div className="border border-gray-300 rounded-lg bg-white shadow p-4 flex-1/2">
+        <h3 className="text-2xl font-bold tracking-tight text-gray-800">
+          Użytkownicy listy: <span className="text-blue-600">{list}</span>
+        </h3>
         {users.length > 0 ? (
           <ul className="space-y-2">
             <AnimatePresence>
@@ -105,24 +116,28 @@ export default function OptionsPanelDemo({ list }: OptionsPanelProps) {
         ) : (
           <p className="text-gray-500 italic">Brak użytkowników.</p>
         )}
+
+        <div className="flex items-center gap-3">
+          <select
+            className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={selectedUser}
+            onChange={(e) => setSelectedUser(e.target.value)}
+          >
+            <option value="">-- Wybierz użytkownika --</option>
+            {AVAILABLE_USERS.filter((u) => !users.includes(u)).map((u) => (
+              <option key={u} value={u}>
+                {u}
+              </option>
+            ))}
+          </select>
+          <Button onClick={addUser} disabled={!selectedUser}>
+            Dodaj
+          </Button>
+        </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <select
-          className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={selectedUser}
-          onChange={(e) => setSelectedUser(e.target.value)}
-        >
-          <option value="">-- Wybierz użytkownika --</option>
-          {AVAILABLE_USERS.filter((u) => !users.includes(u)).map((u) => (
-            <option key={u} value={u}>
-              {u}
-            </option>
-          ))}
-        </select>
-        <Button onClick={addUser} disabled={!selectedUser}>
-          Dodaj
-        </Button>
+      <div className="flex-1/2 items-center gap-3 border border-gray-300 rounded-lg p-4 bg-white shadow">
+        <Button onClick={deleteList}>Delete List</Button>
       </div>
     </div>
   );
