@@ -8,10 +8,10 @@ import ExpensesPanel from "./ExpensesPanelDemo";
 interface Transaction {
   title: string;
   addedBy: string;
-  forUser: string; // ⬅️ dodaj to pole!
+  forUser: string;
   amount: number;
   type: "REQUIREMENT" | "REPAYMENT";
-  date: string;
+  date: string; // format: "YYYY-MM-DD"
 }
 
 export default function MainContentDemo({
@@ -25,7 +25,14 @@ export default function MainContentDemo({
 }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [view, setView] = useState<"info" | "expenses" | "options">("info");
-  const STORAGE_KEY = `demo_transactions_${list}`;
+
+  const [filterMonth, setFilterMonth] = useState<number>(new Date().getMonth());
+  const [filterYear, setFilterYear] = useState<number>(
+    new Date().getFullYear()
+  );
+  const [filteredTransactions, setFilteredTransactions] = useState<
+    Transaction[]
+  >([]);
 
   useEffect(() => {
     const raw = localStorage.getItem("demo_lists");
@@ -33,17 +40,33 @@ export default function MainContentDemo({
 
     try {
       const all = JSON.parse(raw);
-      const current = all[list];
-      if (current && Array.isArray(current.transactions)) {
-        setTransactions(current.transactions);
-      } else {
-        setTransactions([]);
+      const listNames = Object.keys(all);
+
+      if (listNames.length > 0) {
+        const firstList = listNames[0];
+        setList(firstList);
+
+        const current = all[firstList];
+        if (current && Array.isArray(current.transactions)) {
+          setTransactions(current.transactions);
+        } else {
+          setTransactions([]);
+        }
       }
     } catch (err) {
-      console.error("Failed to load transactions:", err);
+      console.error("Failed to load lists:", err);
       setTransactions([]);
     }
-  }, [list]);
+  }, []);
+
+  // Filtrowanie transakcji wg miesiąca i roku
+  useEffect(() => {
+    const filtered = transactions.filter((tx) => {
+      const [year, month] = tx.date.split("-").map(Number);
+      return year === filterYear && month - 1 === filterMonth;
+    });
+    setFilteredTransactions(filtered);
+  }, [transactions, filterMonth, filterYear]);
 
   const addTransaction = (
     title: string,
@@ -51,9 +74,24 @@ export default function MainContentDemo({
     forUser: string,
     addedBy: string
   ) => {
+    if (!list) return;
+
     const raw = localStorage.getItem("demo_lists") || "{}";
     const all = JSON.parse(raw);
-    const current = all[list] || { users: [], transactions: [] };
+
+    let current = all[list];
+
+    if (typeof current === "string") {
+      try {
+        current = JSON.parse(current);
+      } catch {
+        current = null;
+      }
+    }
+
+    if (typeof current !== "object" || current === null) {
+      current = { users: [], transactions: [] };
+    }
 
     const newTx: Transaction = {
       title,
@@ -64,12 +102,22 @@ export default function MainContentDemo({
       date: new Date().toISOString().split("T")[0],
     };
 
-    current.transactions.unshift(newTx); // dodaj na początek
+    (current.transactions ??= []).unshift(newTx);
     all[list] = current;
 
     localStorage.setItem("demo_lists", JSON.stringify(all));
     setTransactions(current.transactions);
   };
+
+  if (!list) {
+    return (
+      <section className="p-8">
+        <p className="text-gray-600">
+          Brak dostępnych list. Utwórz listę, aby rozpocząć.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="flex-1 p-8">
@@ -104,7 +152,7 @@ export default function MainContentDemo({
 
       {view === "info" && (
         <InfoPanel
-          key={view} // <- to wymusi ponowne uruchomienie useEffect w InfoPanel
+          key={view}
           transactions={transactions}
           onAddTransaction={addTransaction}
           onEdit={() => alert("Edit mode not implemented yet")}
@@ -112,7 +160,16 @@ export default function MainContentDemo({
         />
       )}
 
-      {view === "expenses" && <ExpensesPanel />}
+      {view === "expenses" && (
+        <ExpensesPanel
+          onChange={(month, year) => {
+            setFilterMonth(month);
+            setFilterYear(year);
+          }}
+          transactions={filteredTransactions}
+        />
+      )}
+
       {view === "options" && (
         <OptionsPanelDemo
           list={list}
