@@ -15,27 +15,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function UserSidebarDemo({
+  availableLists,
+  setAvailableLists,
   selectedList,
   onSelectList,
 }: {
+  availableLists: string[];
+  setAvailableLists: (lists: string[]) => void;
   selectedList: string | null;
   onSelectList: (list: string) => void;
 }) {
-  const [lists, setLists] = useState<string[]>([]);
   const [newListName, setNewListName] = useState("");
   const [openCreate, setOpenCreate] = useState(false);
   const [openLogout, setOpenLogout] = useState(false);
   const user = "sophia_0345";
-
-  useEffect(() => {
-    const raw = localStorage.getItem("demo_lists");
-    const parsed = raw ? JSON.parse(raw) : [];
-    console.log("Raw lists from localStorage:", raw);
-    console.log("Parsed lists from localStorage:", parsed);
-    const names = Object.keys(parsed); // ["DemoList", "test1", ...]
-    console.log("Loaded lists from localStorage:", names);
-    setLists(names);
-  }, []);
 
   const addList = (name: string) => {
     if (!name.trim()) return;
@@ -56,7 +49,7 @@ export default function UserSidebarDemo({
     };
 
     localStorage.setItem("demo_lists", JSON.stringify(updated));
-    setLists(Object.keys(updated));
+    setAvailableLists(Object.keys(updated));
     onSelectList(name);
     setNewListName("");
     setOpenCreate(false);
@@ -114,7 +107,7 @@ export default function UserSidebarDemo({
           Lists
         </h3>
         <div className="flex flex-col gap-2 mb-4">
-          {lists.map((list) => (
+          {availableLists.map((list) => (
             <button
               key={list}
               onClick={() => onSelectList(list)}

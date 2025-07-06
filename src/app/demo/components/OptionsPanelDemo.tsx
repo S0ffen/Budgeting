@@ -7,6 +7,8 @@ import { Trash2 } from "lucide-react";
 
 interface OptionsPanelProps {
   list: string;
+  setAvailableLists: (lists: string[]) => void;
+  onSelectList: (list: string) => void;
 }
 
 interface ListData {
@@ -16,12 +18,16 @@ interface ListData {
 
 const AVAILABLE_USERS = ["Alice", "Bob", "Charlie", "Diana", "Edward", "Fiona"];
 
-export default function OptionsPanelDemo({ list }: OptionsPanelProps) {
+export default function OptionsPanelDemo({
+  list,
+  setAvailableLists,
+  onSelectList,
+}: OptionsPanelProps) {
   const [users, setUsers] = useState<string[]>([]);
   const [selectedUser, setSelectedUser] = useState("");
 
   useEffect(() => {
-    const raw = localStorage.getItem("demo_list_data");
+    const raw = localStorage.getItem("demo_lists");
     if (!raw) return;
 
     try {
@@ -38,10 +44,16 @@ export default function OptionsPanelDemo({ list }: OptionsPanelProps) {
     }
   }, [list]);
 
+  useEffect(() => {
+    const raw = localStorage.getItem("demo_lists") || "{}";
+    const parsed = JSON.parse(raw);
+    setAvailableLists(Object.keys(parsed));
+  }, []);
+
   const addUser = () => {
     if (!selectedUser || users.includes(selectedUser)) return;
 
-    const raw = localStorage.getItem("demo_list_data") || "{}";
+    const raw = localStorage.getItem("demo_lists") || "{}";
 
     let all: Record<string, ListData>;
     try {
@@ -54,33 +66,40 @@ export default function OptionsPanelDemo({ list }: OptionsPanelProps) {
 
     current.users.push(selectedUser);
     all[list] = current;
-    localStorage.setItem("demo_list_data", JSON.stringify(all));
+    localStorage.setItem("demo_lists", JSON.stringify(all));
     setUsers(current.users);
     setSelectedUser("");
   };
 
   const removeUser = (u: string) => {
-    const raw = localStorage.getItem("demo_list_data") || "{}";
+    const raw = localStorage.getItem("demo_lists") || "{}";
     const all = JSON.parse(raw);
     const current = all[list];
     if (!current) return;
 
     current.users = current.users.filter((user: string) => user !== u);
     all[list] = current;
-    localStorage.setItem("demo_list_data", JSON.stringify(all));
+    localStorage.setItem("demo_lists", JSON.stringify(all));
     setUsers(current.users);
   };
 
   const deleteList = () => {
-    const raw = localStorage.getItem("demo_list_data") || "{}";
-    const all: Record<string, ListData> = JSON.parse(raw);
+    // 1. usuń nazwę z list
+    const rawLists = localStorage.getItem("demo_lists") || "{}";
+    const parsedLists = JSON.parse(rawLists);
+    delete parsedLists[list];
+    localStorage.setItem("demo_lists", JSON.stringify(parsedLists));
 
-    if (all[list]) {
-      delete all[list];
-      localStorage.setItem("demo_list_data", JSON.stringify(all));
-      setUsers([]);
-      setSelectedUser("");
-    }
+    // 2. usuń dane z list_data
+    const rawData = localStorage.getItem("demo_lists") || "{}";
+    const parsedData = JSON.parse(rawData);
+    delete parsedData[list];
+    localStorage.setItem("demo_lists", JSON.stringify(parsedData));
+
+    // 3. przelicz listy i ustaw nową aktywną
+    const updatedLists = Object.keys(parsedLists);
+    setAvailableLists(updatedLists);
+    onSelectList(updatedLists[0] || "");
   };
 
   return (

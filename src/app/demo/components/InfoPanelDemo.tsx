@@ -47,7 +47,7 @@ const InfoPanel: FC<InfoPanelProps> = ({
   const [involvesOtherUser, setInvolvesOtherUser] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("demo_list_data");
+    const raw = localStorage.getItem("demo_list");
     if (!raw) return;
 
     try {

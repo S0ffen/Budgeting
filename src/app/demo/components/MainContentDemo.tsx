@@ -14,7 +14,15 @@ interface Transaction {
   date: string;
 }
 
-export default function MainContentDemo({ list }: { list: string }) {
+export default function MainContentDemo({
+  list,
+  setAvailableLists,
+  setSelectList,
+}: {
+  list: string;
+  setAvailableLists: (lists: string[]) => void;
+  setSelectList: (list: string) => void;
+}) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [view, setView] = useState<"info" | "expenses" | "options">("info");
   const STORAGE_KEY = `demo_transactions_${list}`;
@@ -105,7 +113,13 @@ export default function MainContentDemo({ list }: { list: string }) {
       )}
 
       {view === "expenses" && <ExpensesPanel />}
-      {view === "options" && <OptionsPanelDemo list={list} />}
+      {view === "options" && (
+        <OptionsPanelDemo
+          list={list}
+          setAvailableLists={setAvailableLists}
+          onSelectList={setSelectList}
+        />
+      )}
     </section>
   );
 }

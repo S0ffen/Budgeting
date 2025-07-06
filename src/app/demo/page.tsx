@@ -5,6 +5,15 @@ import MainContentDemo from "./components/MainContentDemo";
 
 export default function Demo() {
   const [selectedList, setSelectedList] = useState("DemoList");
+  // wczytuje listy z localStorage i przechowuje je w stanie
+  // dostępne listy będą używane do wyboru listy w bocznym pasku
+  const [availableLists, setAvailableLists] = useState<string[]>([]);
+  useEffect(() => {
+    const raw = localStorage.getItem("demo_lists") || "{}";
+    const parsed = JSON.parse(raw);
+    setAvailableLists(Object.keys(parsed));
+  }, []);
+
   // Inicjalizacja danych demo
   useEffect(() => {
     const raw = localStorage.getItem("demo_lists");
@@ -51,14 +60,24 @@ export default function Demo() {
       localStorage.setItem("demo_lists", JSON.stringify(demoData));
     }
   }, []);
+  useEffect(() => {
+    console.log("availableLists", availableLists);
+    console.log("selectedList", selectedList);
+  }, [availableLists, selectedList]);
 
   return (
     <main className="flex min-h-screen">
       <UserSidebarDemo
+        availableLists={availableLists}
+        setAvailableLists={setAvailableLists}
         selectedList={selectedList}
         onSelectList={setSelectedList}
       />
-      <MainContentDemo list={selectedList} />
+      <MainContentDemo
+        list={selectedList}
+        setSelectList={setSelectedList}
+        setAvailableLists={setAvailableLists}
+      />
     </main>
   );
 }
