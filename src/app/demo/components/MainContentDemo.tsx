@@ -44,7 +44,6 @@ export default function MainContentDemo({
 
       if (listNames.length > 0) {
         const firstList = listNames[0];
-        setList(firstList);
 
         const current = all[firstList];
         if (current && Array.isArray(current.transactions)) {
