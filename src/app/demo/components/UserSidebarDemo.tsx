@@ -28,7 +28,7 @@ export default function UserSidebarDemo({
   const [newListName, setNewListName] = useState("");
   const [openCreate, setOpenCreate] = useState(false);
   const [openLogout, setOpenLogout] = useState(false);
-  const user = "sophia_0345";
+  const user = "Sophia";
 
   const addList = (name: string) => {
     if (!name.trim()) return;

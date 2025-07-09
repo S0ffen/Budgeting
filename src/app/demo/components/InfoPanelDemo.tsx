@@ -1,4 +1,6 @@
 import { FC, useEffect, useState } from "react";
+import { Trash2 } from "lucide-react";
+
 import {
   Dialog,
   DialogTrigger,
@@ -9,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "motion/react";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface Transaction {
   title: string;
@@ -27,6 +30,7 @@ interface InfoPanelProps {
     forUser: string,
     addedBy: string
   ) => void;
+  onDeleteTransaction: (index: number) => void;
   onEdit: () => void;
   list: string;
 }
@@ -34,6 +38,7 @@ interface InfoPanelProps {
 const InfoPanel: FC<InfoPanelProps> = ({
   transactions,
   onAddTransaction,
+  onDeleteTransaction,
   onEdit,
   list,
 }) => {
@@ -47,7 +52,7 @@ const InfoPanel: FC<InfoPanelProps> = ({
   const [involvesOtherUser, setInvolvesOtherUser] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("demo_list");
+    const raw = localStorage.getItem("demo_lists");
     if (!raw) return;
 
     try {
@@ -55,6 +60,7 @@ const InfoPanel: FC<InfoPanelProps> = ({
       const listData = all[list];
       if (listData && Array.isArray(listData.users)) {
         setUsers(listData.users);
+        console.log("Loaded users:", listData.users);
         setSelectedUser((prev) =>
           listData.users.includes(prev) ? prev : listData.users[0] || ""
         );
@@ -69,7 +75,6 @@ const InfoPanel: FC<InfoPanelProps> = ({
 
   const handleAdd = () => {
     if (!newTitle.trim() || !newAmount.trim()) return;
-
     let forUser = currentUser;
     let addedBy = currentUser;
 
@@ -91,8 +96,12 @@ const InfoPanel: FC<InfoPanelProps> = ({
   return (
     <div className="space-y-4 mb-8">
       {transactions.map((tx, i) => (
-        <div
-          key={i}
+        <motion.div
+          key={tx.title + tx.date} // ważne: unikalny klucz, nie sam `i`
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.2 }}
           className="flex justify-between items-center bg-white p-4 rounded shadow"
         >
           <div className="flex items-center gap-4">
@@ -105,11 +114,22 @@ const InfoPanel: FC<InfoPanelProps> = ({
               </div>
             </div>
           </div>
-          <div className="text-right">
-            <div className="uppercase text-sm text-gray-500">{tx.type}</div>
-            <div className="text-lg font-bold">${tx.amount.toFixed(2)}</div>
+          <div className="flex items-center gap-4">
+            {/* Typ + kwota */}
+            <div className="text-right">
+              <div className="uppercase text-sm text-gray-500">{tx.type}</div>
+              <div className="text-lg font-bold">${tx.amount.toFixed(2)}</div>
+            </div>
+
+            {/* Kosz jako osobny blok */}
+            <button
+              className="p-2 hover:text-red-500 hover:bg-red-100 rounded"
+              onClick={() => onDeleteTransaction(i)}
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
           </div>
-        </div>
+        </motion.div>
       ))}
 
       <div className="flex justify-between gap-4">
@@ -128,6 +148,9 @@ const InfoPanel: FC<InfoPanelProps> = ({
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
+              <DialogDescription>
+                Fill in the title and amount, then click "Add".
+              </DialogDescription>
               <DialogTitle>Create new item</DialogTitle>
             </DialogHeader>
 

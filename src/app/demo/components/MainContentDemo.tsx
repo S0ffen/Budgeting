@@ -15,11 +15,11 @@ interface Transaction {
 }
 
 export default function MainContentDemo({
-  list,
+  selectedList,
   setAvailableLists,
   setSelectList,
 }: {
-  list: string;
+  selectedList: string;
   setAvailableLists: (lists: string[]) => void;
   setSelectList: (list: string) => void;
 }) {
@@ -34,29 +34,27 @@ export default function MainContentDemo({
     Transaction[]
   >([]);
 
+  // Wczytywanie zawartośći listy z localStorage
   useEffect(() => {
+    if (!selectedList) return;
+
     const raw = localStorage.getItem("demo_lists");
     if (!raw) return;
 
     try {
       const all = JSON.parse(raw);
-      const listNames = Object.keys(all);
+      const current = all[selectedList];
 
-      if (listNames.length > 0) {
-        const firstList = listNames[0];
-
-        const current = all[firstList];
-        if (current && Array.isArray(current.transactions)) {
-          setTransactions(current.transactions);
-        } else {
-          setTransactions([]);
-        }
+      if (current && Array.isArray(current.transactions)) {
+        setTransactions(current.transactions);
+      } else {
+        setTransactions([]);
       }
     } catch (err) {
-      console.error("Failed to load lists:", err);
+      console.error("Failed to load transactions:", err);
       setTransactions([]);
     }
-  }, []);
+  }, [selectedList]);
 
   // Filtrowanie transakcji wg miesiąca i roku
   useEffect(() => {
@@ -73,12 +71,12 @@ export default function MainContentDemo({
     forUser: string,
     addedBy: string
   ) => {
-    if (!list) return;
+    if (!selectedList) return;
 
     const raw = localStorage.getItem("demo_lists") || "{}";
     const all = JSON.parse(raw);
 
-    let current = all[list];
+    let current = all[selectedList];
 
     if (typeof current === "string") {
       try {
@@ -102,13 +100,29 @@ export default function MainContentDemo({
     };
 
     (current.transactions ??= []).unshift(newTx);
-    all[list] = current;
+    all[selectedList] = current;
 
     localStorage.setItem("demo_lists", JSON.stringify(all));
     setTransactions(current.transactions);
   };
 
-  if (!list) {
+  const deleteTransaction = (index: number) => {
+    const raw = localStorage.getItem("demo_lists");
+    if (!raw) return;
+
+    const all = JSON.parse(raw);
+    const current = all[selectedList];
+
+    if (!current || !Array.isArray(current.transactions)) return;
+
+    current.transactions.splice(index, 1);
+    all[selectedList] = current;
+
+    localStorage.setItem("demo_lists", JSON.stringify(all));
+    setTransactions([...current.transactions]); // <- ważne!
+  };
+
+  if (!selectedList) {
     return (
       <section className="p-8">
         <p className="text-gray-600">
@@ -121,7 +135,7 @@ export default function MainContentDemo({
   return (
     <section className="flex-1 p-8">
       <header className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">List: {list}</h2>
+        <h2 className="text-2xl font-bold">List: {selectedList}</h2>
         <nav className="flex gap-6 text-gray-600 font-medium">
           <a href="#">Home</a>
           <a href="#">Create List</a>
@@ -154,8 +168,9 @@ export default function MainContentDemo({
           key={view}
           transactions={transactions}
           onAddTransaction={addTransaction}
+          onDeleteTransaction={deleteTransaction}
           onEdit={() => alert("Edit mode not implemented yet")}
-          list={list}
+          list={selectedList}
         />
       )}
 
@@ -171,7 +186,7 @@ export default function MainContentDemo({
 
       {view === "options" && (
         <OptionsPanelDemo
-          list={list}
+          list={selectedList}
           setAvailableLists={setAvailableLists}
           onSelectList={setSelectList}
         />

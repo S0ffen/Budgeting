@@ -74,7 +74,7 @@ export default function Demo() {
         onSelectList={setSelectedList}
       />
       <MainContentDemo
-        list={selectedList}
+        selectedList={selectedList}
         setSelectList={setSelectedList}
         setAvailableLists={setAvailableLists}
       />
