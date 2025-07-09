@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"; // upewnij się, że ścieżka się zgadza
 
 interface OptionsPanelProps {
   list: string;
@@ -103,8 +110,8 @@ export default function OptionsPanelDemo({
   };
 
   return (
-    <div className="space-y-6 max-w-xl p-6 flex">
-      <div className="border border-gray-300 rounded-lg bg-white shadow p-4 flex-1/2">
+    <div className="space-y-6 max-w-xl p-6 flex border border-gray-300 rounded-lg bg-white shadow">
+      <div className="flex-1/2 border border-gray-300 rounded-lg">
         <h3 className="text-2xl font-bold tracking-tight text-gray-800">
           Użytkownicy listy: <span className="text-blue-600">{list}</span>
         </h3>
@@ -137,25 +144,31 @@ export default function OptionsPanelDemo({
         )}
 
         <div className="flex items-center gap-3">
-          <select
-            className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={selectedUser}
-            onChange={(e) => setSelectedUser(e.target.value)}
-          >
-            <option value="">-- Wybierz użytkownika --</option>
-            {AVAILABLE_USERS.filter((u) => !users.includes(u)).map((u) => (
-              <option key={u} value={u}>
-                {u}
-              </option>
-            ))}
-          </select>
+          <Select value={selectedUser} onValueChange={setSelectedUser}>
+            <SelectTrigger>
+              <SelectValue placeholder="Wybierz użytkownika" />
+            </SelectTrigger>
+            <SelectContent>
+              {AVAILABLE_USERS.filter((u) => !users.includes(u)).map((u) => (
+                <SelectItem key={u} value={u}>
+                  {u}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <Button onClick={addUser} disabled={!selectedUser}>
             Dodaj
           </Button>
+          <br />
         </div>
       </div>
-
-      <div className="flex-1/2 items-center gap-3 border border-gray-300 rounded-lg p-4 bg-white shadow">
+      <div>
+        <p className="text-sm text-gray-500">
+          Currency: <span className="font-medium">PLN</span>
+        </p>
+      </div>
+      <div className="justify-end">
         <Button onClick={deleteList}>Delete List</Button>
       </div>
     </div>

@@ -10,7 +10,7 @@ interface Transaction {
   addedBy: string;
   forUser: string;
   amount: number;
-  type: "REQUIREMENT" | "REPAYMENT";
+  category: string;
   date: string; // format: "YYYY-MM-DD"
 }
 
@@ -69,7 +69,8 @@ export default function MainContentDemo({
     title: string,
     amount: number,
     forUser: string,
-    addedBy: string
+    addedBy: string,
+    category: string
   ) => {
     if (!selectedList) return;
 
@@ -94,8 +95,8 @@ export default function MainContentDemo({
       title,
       amount,
       forUser,
+      category,
       addedBy,
-      type: "REQUIREMENT",
       date: new Date().toISOString().split("T")[0],
     };
 

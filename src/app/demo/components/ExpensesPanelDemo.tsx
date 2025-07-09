@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from "react";
 
 const months = [
-  "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
-  "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień",
+  "Styczeń",
+  "Luty",
+  "Marzec",
+  "Kwiecień",
+  "Maj",
+  "Czerwiec",
+  "Lipiec",
+  "Sierpień",
+  "Wrzesień",
+  "Październik",
+  "Listopad",
+  "Grudzień",
 ];
 
 const years = [2023, 2024, 2025];
@@ -12,7 +22,7 @@ type Transaction = {
   addedBy: string;
   forUser: string;
   amount: number;
-  type: "REQUIREMENT" | "REPAYMENT";
+  category: string;
   date: string;
 };
 
@@ -22,8 +32,12 @@ type Props = {
 };
 
 const ExpensesPanel: React.FC<Props> = ({ onChange, transactions }) => {
-  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number>(
+    new Date().getMonth()
+  );
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear()
+  );
 
   useEffect(() => {
     onChange(selectedMonth, selectedYear);
@@ -42,7 +56,10 @@ const ExpensesPanel: React.FC<Props> = ({ onChange, transactions }) => {
     );
   });
 
-  const totalAmount = filteredTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+  const totalAmount = filteredTransactions.reduce(
+    (sum, tx) => sum + tx.amount,
+    0
+  );
 
   return (
     <div>
@@ -76,23 +93,20 @@ const ExpensesPanel: React.FC<Props> = ({ onChange, transactions }) => {
       <p>Łączna kwota: {totalAmount} PLN</p>
 
       <ul className="mt-4 space-y-2">
-      {transactions.length === 0 && <li>Brak transakcji w tym okresie.</li>}
-      {transactions.map((tx, idx) => (
-        <li
-          key={idx}
-          className="p-3 border rounded shadow-sm bg-white"
-        >
-          <div className="font-semibold">{tx.title}</div>
-          <div className="text-sm text-gray-600">
-            <span className="mr-2">📅 {tx.date}</span>
-            <span className="mr-2">👤 Dodane przez: {tx.addedBy}</span>
-            <span className="mr-2">➡️ Dla: {tx.forUser}</span>
-            <span className="mr-2">💸 {tx.amount} PLN</span>
-            <span className="ml-2 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 border">
-              {tx.type === "REQUIREMENT" ? "Wymagane" : "Spłata"}
-            </span>
-          </div>
-        </li>
+        {transactions.length === 0 && <li>Brak transakcji w tym okresie.</li>}
+        {transactions.map((tx, idx) => (
+          <li key={idx} className="p-3 border rounded shadow-sm bg-white">
+            <div className="font-semibold">{tx.title}</div>
+            <div className="text-sm text-gray-600">
+              <span className="mr-2">📅 {tx.date}</span>
+              <span className="mr-2">👤 Dodane przez: {tx.addedBy}</span>
+              <span className="mr-2">➡️ Dla: {tx.forUser}</span>
+              <span className="mr-2">💸 {tx.amount} PLN</span>
+              <span className="ml-2 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 border">
+                {tx.category}
+              </span>
+            </div>
+          </li>
         ))}
       </ul>
     </div>
