@@ -5,7 +5,7 @@ import OptionsPanelDemo from "./OptionsPanelDemo";
 import InfoPanel from "./InfoPanelDemo";
 import ExpensesPanel from "./ExpensesPanelDemo";
 
-interface Transaction {
+export interface Transaction {
   title: string;
   addedBy: string;
   forUser: string;

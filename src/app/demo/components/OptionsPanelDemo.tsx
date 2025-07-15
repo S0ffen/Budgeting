@@ -11,6 +11,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select"; // upewnij się, że ścieżka się zgadza
+import type { Transaction } from "./MainContentDemo"; // jeśli chcesz współdzielić typ
 
 interface OptionsPanelProps {
   list: string;
@@ -22,7 +23,7 @@ interface OptionsPanelProps {
 
 interface ListData {
   users: string[];
-  transactions: any[];
+  transactions: Transaction;
 }
 
 const AVAILABLE_USERS = ["Alice", "Bob", "Charlie", "Diana", "Edward", "Fiona"];
