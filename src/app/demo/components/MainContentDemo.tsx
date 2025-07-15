@@ -171,6 +171,8 @@ export default function MainContentDemo({
       </section>
     );
   }
+  //TODO zrozumieć ten kod
+  const views = ["info", "expenses", "options"] as const;
 
   return (
     <section className="flex-1 p-8">
@@ -184,10 +186,10 @@ export default function MainContentDemo({
       </header>
 
       <div className="flex border-b border-gray-300 mb-4">
-        {["info", "expenses", "options"].map((v) => (
+        {views.map((v) => (
           <button
             key={v}
-            onClick={() => setView(v as any)}
+            onClick={() => setView(v)}
             className={`w-1/3 text-center py-2 font-semibold border-b-2 transition ${
               view === v
                 ? "border-black text-black"
