@@ -1,6 +1,6 @@
 // src/app/components/MainContentDemo.tsx
 "use client";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import OptionsPanelDemo from "./OptionsPanelDemo";
 import InfoPanel from "./InfoPanelDemo";
 import ExpensesPanel from "./ExpensesPanelDemo";

@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { Trash2, Pencil, ShowerHead } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
 
 import {
   Dialog,
@@ -233,7 +233,7 @@ const InfoPanel: FC<InfoPanelProps> = ({
               onClick={handleEdit}
               disabled={!newTitle.trim() || !newAmount.trim()}
             >
-              Nygger
+              Save Changes
             </Button>
           </DialogContent>
         </Dialog>
@@ -249,7 +249,7 @@ const InfoPanel: FC<InfoPanelProps> = ({
           <DialogContent>
             <DialogHeader>
               <DialogDescription>
-                Fill in the title and amount, then click "Add".
+                Fill in the title and amount
               </DialogDescription>
               <DialogTitle>Create new item</DialogTitle>
             </DialogHeader>
