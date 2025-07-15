@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil, ShowerHead } from "lucide-react";
 
 import {
   Dialog,
@@ -39,7 +39,7 @@ interface InfoPanelProps {
     category: string
   ) => void;
   onDeleteTransaction: (index: number) => void;
-  onEdit: () => void;
+  onEditTransaction: (index: number, updated: Partial<Transaction>) => void;
   list: string;
 }
 
@@ -47,11 +47,17 @@ const InfoPanel: FC<InfoPanelProps> = ({
   transactions,
   onAddTransaction,
   onDeleteTransaction,
-  onEdit,
+  onEditTransaction,
   list,
 }) => {
   const currentUser = "Sophia";
+  //Dialogi
   const [showAdd, setShowAdd] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [currentCurrency, setCurrentCurrency] = useState("");
+
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
   const [newTitle, setNewTitle] = useState("");
   const [newAmount, setNewAmount] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
@@ -68,11 +74,12 @@ const InfoPanel: FC<InfoPanelProps> = ({
       const all = JSON.parse(raw);
       const listData = all[list];
       if (listData && Array.isArray(listData.users)) {
+        console.log("Loaded Data into InfoPanel:", listData);
         setUsers(listData.users);
-        console.log("Loaded users:", listData.users);
         setSelectedUser((prev) =>
           listData.users.includes(prev) ? prev : listData.users[0] || ""
         );
+        setCurrentCurrency(listData.currency); // domyślna waluta
       } else {
         setUsers([]);
       }
@@ -107,6 +114,34 @@ const InfoPanel: FC<InfoPanelProps> = ({
     setIsUserOwesMe(true);
     setShowAdd(false);
   };
+  const handleEdit = () => {
+    //fallback
+    if (!newTitle.trim() || !newAmount.trim() || selectedIndex === null) return;
+    const selectedTransaction = transactions[selectedIndex];
+    console.log("Selected Transaction:", selectedTransaction);
+    const UpdatingTransaction: Transaction = {
+      ...selectedTransaction,
+      title: newTitle,
+      amount: parseFloat(newAmount),
+      forUser: selectedTransaction.forUser,
+      addedBy: selectedTransaction.addedBy,
+      category: newCategory,
+    };
+    console.log("Updating Transaction:", UpdatingTransaction);
+    onEditTransaction(selectedIndex, {
+      title: newTitle,
+      amount: parseFloat(newAmount),
+      category: newCategory,
+    });
+    setShowEdit(false);
+  };
+
+  useEffect(() => {
+    console.log("list", list);
+    const test = localStorage.getItem("demo_lists");
+    const parsedtest = JSON.parse(test || "{}");
+    console.log("test", parsedtest[list].currency);
+  }, [showEdit]);
 
   return (
     <div className="space-y-4 mb-8">
@@ -136,7 +171,9 @@ const InfoPanel: FC<InfoPanelProps> = ({
               <div className="uppercase text-sm text-gray-500">
                 {tx.category}
               </div>
-              <div className="text-lg font-bold">${tx.amount.toFixed(2)}</div>
+              <div className="text-lg font-bold">
+                {tx.amount.toFixed(2)} {currentCurrency}
+              </div>
             </div>
 
             {/* Kosz jako osobny blok */}
@@ -146,18 +183,63 @@ const InfoPanel: FC<InfoPanelProps> = ({
             >
               <Trash2 className="w-5 h-5" />
             </button>
+            {/* Edycja jako osobny blok */}
+            <button
+              className="p-2 hover:text-yellow-500 hover:bg-red-100 rounded"
+              onClick={() => {
+                setSelectedIndex(i); // <- `i` to index z `.map`
+                setNewTitle(tx.title); // <- wczytaj dane transakcji
+                setNewAmount(tx.amount.toString());
+                setShowEdit(true);
+              }}
+            >
+              <Pencil className="w-5 h-5" />
+            </button>
           </div>
         </motion.div>
       ))}
 
-      <div className="flex justify-between gap-4">
-        <button
-          className="flex-1 bg-gray-200 hover:bg-gray-300 py-3 rounded font-semibold"
-          onClick={onEdit}
-        >
-          Edit items
-        </button>
+      {selectedIndex !== null && (
+        <Dialog open={showEdit} onOpenChange={setShowEdit}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Transaction</DialogTitle>
+            </DialogHeader>
+            <Input
+              placeholder="Title"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              className="mb-2"
+            />
+            <Input
+              type="number"
+              placeholder="Amount"
+              value={newAmount}
+              onChange={(e) => setNewAmount(e.target.value)}
+              className="mb-2"
+            />
+            <Select value={newCategory} onValueChange={setNewCategory}>
+              <SelectTrigger className="w-full mb-4">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="food">🍕 Food</SelectItem>
+                <SelectItem value="house">🏠 House</SelectItem>
+                <SelectItem value="subscription">📺 Subscription</SelectItem>
+                <SelectItem value="other">🛒 Other</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={handleEdit}
+              disabled={!newTitle.trim() || !newAmount.trim()}
+            >
+              Nygger
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
 
+      <div className="flex justify-between gap-4">
         <Dialog open={showAdd} onOpenChange={setShowAdd}>
           <DialogTrigger asChild>
             <button className="flex-1 bg-teal-200 hover:bg-teal-300 py-3 rounded font-semibold">
@@ -185,6 +267,7 @@ const InfoPanel: FC<InfoPanelProps> = ({
               onChange={(e) => setNewAmount(e.target.value)}
               className="mb-2"
             />
+
             <Select value={newCategory} onValueChange={setNewCategory}>
               <SelectTrigger className="w-full mb-4">
                 <SelectValue placeholder="Select a category" />

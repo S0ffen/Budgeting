@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2 } from "lucide-react";
@@ -16,6 +16,8 @@ interface OptionsPanelProps {
   list: string;
   setAvailableLists: (lists: string[]) => void;
   onSelectList: (list: string) => void;
+  currency: string;
+  setCurrency: (currency: string) => void;
 }
 
 interface ListData {
@@ -26,10 +28,12 @@ interface ListData {
 const AVAILABLE_USERS = ["Alice", "Bob", "Charlie", "Diana", "Edward", "Fiona"];
 
 export default function OptionsPanelDemo({
-  list,
+  selectedList,
   setAvailableLists,
   onSelectList,
-}: OptionsPanelProps) {
+  currency,
+  setCurrency,
+}: Omit<OptionsPanelProps, "list"> & { selectedList: string }) {
   const [users, setUsers] = useState<string[]>([]);
   const [selectedUser, setSelectedUser] = useState("");
 
@@ -39,7 +43,7 @@ export default function OptionsPanelDemo({
 
     try {
       const all: Record<string, ListData> = JSON.parse(raw);
-      const listData = all[list];
+      const listData = all[selectedList];
       if (listData && Array.isArray(listData.users)) {
         setUsers(listData.users);
       } else {
@@ -49,7 +53,7 @@ export default function OptionsPanelDemo({
       console.error("Failed to parse localStorage demo_list_data:", err);
       setUsers([]);
     }
-  }, [list]);
+  }, [selectedList]);
 
   useEffect(() => {
     const raw = localStorage.getItem("demo_lists") || "{}";
@@ -69,10 +73,10 @@ export default function OptionsPanelDemo({
       all = {};
     }
 
-    const current = all[list] || { users: [], transactions: [] };
+    const current = all[selectedList] || { users: [], transactions: [] };
 
     current.users.push(selectedUser);
-    all[list] = current;
+    all[selectedList] = current;
     localStorage.setItem("demo_lists", JSON.stringify(all));
     setUsers(current.users);
     setSelectedUser("");
@@ -81,11 +85,11 @@ export default function OptionsPanelDemo({
   const removeUser = (u: string) => {
     const raw = localStorage.getItem("demo_lists") || "{}";
     const all = JSON.parse(raw);
-    const current = all[list];
+    const current = all[selectedList];
     if (!current) return;
 
     current.users = current.users.filter((user: string) => user !== u);
-    all[list] = current;
+    all[selectedList] = current;
     localStorage.setItem("demo_lists", JSON.stringify(all));
     setUsers(current.users);
   };
@@ -94,13 +98,13 @@ export default function OptionsPanelDemo({
     // 1. usuń nazwę z list
     const rawLists = localStorage.getItem("demo_lists") || "{}";
     const parsedLists = JSON.parse(rawLists);
-    delete parsedLists[list];
+    delete parsedLists[selectedList];
     localStorage.setItem("demo_lists", JSON.stringify(parsedLists));
 
     // 2. usuń dane z list_data
     const rawData = localStorage.getItem("demo_lists") || "{}";
     const parsedData = JSON.parse(rawData);
-    delete parsedData[list];
+    delete parsedData[selectedList];
     localStorage.setItem("demo_lists", JSON.stringify(parsedData));
 
     // 3. przelicz listy i ustaw nową aktywną
@@ -113,7 +117,8 @@ export default function OptionsPanelDemo({
     <div className="space-y-6 max-w-xl p-6 flex border border-gray-300 rounded-lg bg-white shadow">
       <div className="flex-1/2 border border-gray-300 rounded-lg">
         <h3 className="text-2xl font-bold tracking-tight text-gray-800">
-          Użytkownicy listy: <span className="text-blue-600">{list}</span>
+          Użytkownicy listy:{" "}
+          <span className="text-blue-600">{selectedList}</span>
         </h3>
         {users.length > 0 ? (
           <ul className="space-y-2">
@@ -170,6 +175,18 @@ export default function OptionsPanelDemo({
       </div>
       <div className="justify-end">
         <Button onClick={deleteList}>Delete List</Button>
+      </div>
+      <div>
+        <Select value={currency} onValueChange={setCurrency}>
+          <SelectTrigger>
+            <SelectValue placeholder="Wybierz użytkownika" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="USD">USD</SelectItem>
+            <SelectItem value="EUR">EUR</SelectItem>
+            <SelectItem value="PLN">PLN</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

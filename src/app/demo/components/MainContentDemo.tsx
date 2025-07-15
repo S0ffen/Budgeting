@@ -1,6 +1,6 @@
 // src/app/components/MainContentDemo.tsx
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import OptionsPanelDemo from "./OptionsPanelDemo";
 import InfoPanel from "./InfoPanelDemo";
 import ExpensesPanel from "./ExpensesPanelDemo";
@@ -26,6 +26,8 @@ export default function MainContentDemo({
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [view, setView] = useState<"info" | "expenses" | "options">("info");
 
+  const [currency, setCurrency] = useState("USD");
+
   const [filterMonth, setFilterMonth] = useState<number>(new Date().getMonth());
   const [filterYear, setFilterYear] = useState<number>(
     new Date().getFullYear()
@@ -44,17 +46,30 @@ export default function MainContentDemo({
     try {
       const all = JSON.parse(raw);
       const current = all[selectedList];
-
-      if (current && Array.isArray(current.transactions)) {
-        setTransactions(current.transactions);
-      } else {
-        setTransactions([]);
-      }
+      setTransactions(current.transactions);
+      setCurrency(current.currency || "USD");
     } catch (err) {
       console.error("Failed to load transactions:", err);
       setTransactions([]);
     }
   }, [selectedList]);
+
+  //Ustawienie waluty
+  useEffect(() => {
+    //fallback
+    if (!selectedList || !currency) return;
+
+    const raw = localStorage.getItem("demo_lists");
+    if (!raw) return;
+    try {
+      const all = JSON.parse(raw);
+      const current = all[selectedList];
+      current.currency = currency;
+      localStorage.setItem("demo_lists", JSON.stringify(all));
+    } catch (err) {
+      console.error("Failed to load currency:", err);
+    }
+  }, [currency]);
 
   // Filtrowanie transakcji wg miesiąca i roku
   useEffect(() => {
@@ -100,11 +115,35 @@ export default function MainContentDemo({
       date: new Date().toISOString().split("T")[0],
     };
 
+    console.log("Adding transaction:", newTx);
+
     (current.transactions ??= []).unshift(newTx);
     all[selectedList] = current;
 
     localStorage.setItem("demo_lists", JSON.stringify(all));
     setTransactions(current.transactions);
+  };
+  const editTransaction = (index: number, updated: Partial<Transaction>) => {
+    const raw = localStorage.getItem("demo_lists");
+    if (!raw) return;
+
+    const all = JSON.parse(raw);
+    const current = all[selectedList];
+
+    if (!current || !Array.isArray(current.transactions)) return;
+
+    const oldTx = current.transactions[index];
+    const updatedTx = {
+      ...oldTx,
+      ...updated,
+      date: oldTx.date, // zachowujemy datę oryginalną
+    };
+
+    current.transactions[index] = updatedTx;
+    all[selectedList] = current;
+
+    localStorage.setItem("demo_lists", JSON.stringify(all));
+    setTransactions([...current.transactions]);
   };
 
   const deleteTransaction = (index: number) => {
@@ -170,7 +209,7 @@ export default function MainContentDemo({
           transactions={transactions}
           onAddTransaction={addTransaction}
           onDeleteTransaction={deleteTransaction}
-          onEdit={() => alert("Edit mode not implemented yet")}
+          onEditTransaction={editTransaction}
           list={selectedList}
         />
       )}
@@ -187,9 +226,11 @@ export default function MainContentDemo({
 
       {view === "options" && (
         <OptionsPanelDemo
-          list={selectedList}
+          selectedList={selectedList}
           setAvailableLists={setAvailableLists}
           onSelectList={setSelectList}
+          currency={currency}
+          setCurrency={setCurrency}
         />
       )}
     </section>
