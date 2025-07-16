@@ -21,6 +21,7 @@ export default function Demo() {
       const demoData = {
         DemoList: {
           users: ["Alice", "Bob"],
+          currency: "USD",
           transactions: [
             {
               title: "Lunch",

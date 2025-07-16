@@ -115,8 +115,8 @@ export default function OptionsPanelDemo({
   };
 
   return (
-    <div className="space-y-6 max-w-xl p-6 flex border border-gray-300 rounded-lg bg-white shadow">
-      <div className="flex-1/2 border border-gray-300 rounded-lg">
+    <div className="space-y-6  p-6 flex border border-gray-300 rounded-lg bg-white shadow w-full">
+      <div className="flex-1">
         <h3 className="text-2xl font-bold tracking-tight text-gray-800">
           Użytkownicy listy:{" "}
           <span className="text-blue-600">{selectedList}</span>
@@ -169,15 +169,7 @@ export default function OptionsPanelDemo({
           <br />
         </div>
       </div>
-      <div>
-        <p className="text-sm text-gray-500">
-          Currency: <span className="font-medium">PLN</span>
-        </p>
-      </div>
-      <div className="justify-end">
-        <Button onClick={deleteList}>Delete List</Button>
-      </div>
-      <div>
+      <div className="mt-4">
         <Select value={currency} onValueChange={setCurrency}>
           <SelectTrigger>
             <SelectValue placeholder="Wybierz użytkownika" />
@@ -188,6 +180,9 @@ export default function OptionsPanelDemo({
             <SelectItem value="PLN">PLN</SelectItem>
           </SelectContent>
         </Select>
+        <div className="justify-end">
+          <Button onClick={deleteList}>Delete List</Button>
+        </div>
       </div>
     </div>
   );
