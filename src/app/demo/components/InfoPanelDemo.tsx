@@ -136,13 +136,6 @@ const InfoPanel: FC<InfoPanelProps> = ({
     setShowEdit(false);
   };
 
-  useEffect(() => {
-    console.log("list", list);
-    const test = localStorage.getItem("demo_lists");
-    const parsedtest = JSON.parse(test || "{}");
-    console.log("test", parsedtest[list].currency);
-  }, [showEdit]);
-
   return (
     <div className="space-y-4 mb-8">
       {transactions.map((tx, i) => (
@@ -243,7 +236,7 @@ const InfoPanel: FC<InfoPanelProps> = ({
         <Dialog open={showAdd} onOpenChange={setShowAdd}>
           <DialogTrigger asChild>
             <button className="flex-1 bg-teal-200 hover:bg-teal-300 py-3 rounded font-semibold">
-              Add item
+              Add
             </button>
           </DialogTrigger>
           <DialogContent>
