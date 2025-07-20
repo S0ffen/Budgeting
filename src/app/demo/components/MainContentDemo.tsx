@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 import OptionsPanelDemo from "./OptionsPanelDemo";
 import InfoPanel from "./InfoPanelDemo";
 import ExpensesPanel from "./ExpensesPanelDemo";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"; // upewnij się, że ścieżka się zgadza
 
 export interface Transaction {
   title: string;
@@ -85,7 +92,8 @@ export default function MainContentDemo({
     amount: number,
     forUser: string,
     addedBy: string,
-    category: string
+    category: string,
+    date: string
   ) => {
     if (!selectedList) return;
 
@@ -112,7 +120,7 @@ export default function MainContentDemo({
       forUser,
       category,
       addedBy,
-      date: new Date().toISOString().split("T")[0],
+      date,
     };
 
     console.log("Adding transaction:", newTx);
@@ -176,15 +184,33 @@ export default function MainContentDemo({
 
   return (
     <section className="flex-1 p-8">
-      <header className="flex justify-between items-center mb-6">
+      <header className="flex flex-col gap-y-2 mb-6">
         <h2 className="text-2xl font-bold">List: {selectedList}</h2>
-        <nav className="flex gap-6 text-gray-600 font-medium">
-          <a href="#">Home</a>
-          <a href="#">Create List</a>
-          <a href="#">About us</a>
-        </nav>
+        <div className="flex-col">
+          <div className="flex">
+            <span className="text-xl font-bold mr-2">Year: </span>
+            <Select>
+              <SelectTrigger className="">
+                <SelectValue placeholder="Select a Year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="food">2024</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex">
+            <span className="text-xl font-bold mr-2">Month: </span>
+            <Select>
+              <SelectTrigger className="">
+                <SelectValue placeholder="Select a Month" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="food">January</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </header>
-
       <div className="flex border-b border-gray-300 mb-4">
         {views.map((v) => (
           <button
@@ -216,15 +242,7 @@ export default function MainContentDemo({
         />
       )}
 
-      {view === "expenses" && (
-        <ExpensesPanel
-          onChange={(month, year) => {
-            setFilterMonth(month);
-            setFilterYear(year);
-          }}
-          transactions={filteredTransactions}
-        />
-      )}
+      {view === "expenses" && <ExpensesPanel />}
 
       {view === "options" && (
         <OptionsPanelDemo

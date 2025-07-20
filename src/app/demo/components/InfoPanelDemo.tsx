@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { Trash2, Pencil } from "lucide-react";
+import { Trash2, Pencil, CalendarIcon } from "lucide-react";
 
 import {
   Dialog,
@@ -18,7 +18,14 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select"; // upewnij się, że ścieżka się zgadza
+} from "@/components/ui/select";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface Transaction {
   title: string;
@@ -36,7 +43,8 @@ interface InfoPanelProps {
     amount: number,
     forUser: string,
     addedBy: string,
-    category: string
+    category: string,
+    date: string
   ) => void;
   onDeleteTransaction: (index: number) => void;
   onEditTransaction: (index: number, updated: Partial<Transaction>) => void;
@@ -65,6 +73,8 @@ const InfoPanel: FC<InfoPanelProps> = ({
   const [users, setUsers] = useState<string[]>([]);
   const [involvesOtherUser, setInvolvesOtherUser] = useState(false);
   const [newCategory, setNewCategory] = useState("food"); // domyślna wartość
+
+  const [date, setDate] = useState<Date>();
 
   useEffect(() => {
     const raw = localStorage.getItem("demo_lists");
@@ -104,7 +114,8 @@ const InfoPanel: FC<InfoPanelProps> = ({
       parseFloat(newAmount),
       forUser,
       addedBy,
-      newCategory
+      newCategory,
+      date?.toDateString() || new Date().toDateString()
     );
 
     setNewTitle("");
@@ -191,7 +202,7 @@ const InfoPanel: FC<InfoPanelProps> = ({
           </div>
         </motion.div>
       ))}
-
+      {/* Dialog Edycji Elementu */}
       {selectedIndex !== null && (
         <Dialog open={showEdit} onOpenChange={setShowEdit}>
           <DialogContent>
@@ -231,7 +242,7 @@ const InfoPanel: FC<InfoPanelProps> = ({
           </DialogContent>
         </Dialog>
       )}
-
+      {/* Dialog Dodawania Elementu */}
       <div className="flex justify-between gap-4">
         <Dialog open={showAdd} onOpenChange={setShowAdd}>
           <DialogTrigger asChild>
@@ -272,6 +283,21 @@ const InfoPanel: FC<InfoPanelProps> = ({
                 <SelectItem value="other">🛒 Other</SelectItem>
               </SelectContent>
             </Select>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  data-empty={!date}
+                  className="data-[empty=true]:text-muted-foreground w-[280px] justify-start text-left font-normal"
+                >
+                  <CalendarIcon />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar mode="single" selected={date} onSelect={setDate} />
+              </PopoverContent>
+            </Popover>
 
             <label className="flex items-center gap-2 mb-2">
               <input
@@ -285,36 +311,45 @@ const InfoPanel: FC<InfoPanelProps> = ({
 
             {involvesOtherUser && (
               <>
-                <div className="relative flex items-center justify-center gap-24 mb-4 h-10">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={isUserOwesMe ? "pink-left" : "pink-right"}
-                      initial={{ x: isUserOwesMe ? -80 : 80, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: isUserOwesMe ? 80 : -80, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className={`absolute ${
-                        isUserOwesMe ? "left-0" : "right-0"
-                      } w-10 h-10 bg-pink-300 rounded-full`}
-                    />
-                  </AnimatePresence>
+                <div className="w-full flex items-center justify-center">
                   <button
                     className="z-10 text-sm underline"
                     onClick={() => setIsUserOwesMe((prev) => !prev)}
                   >
                     Swap
                   </button>
+                </div>
+                <div className="flex items-center justify-center gap-12 mb-4 h-10">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={isUserOwesMe ? "pink-left" : "pink-right"}
+                      initial={{ x: isUserOwesMe ? -80 : 40, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: isUserOwesMe ? 80 : -40, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={`absolute ${
+                        isUserOwesMe ? "left-80" : "right-80"
+                      } `}
+                    >
+                      <span>{currentUser}</span>
+                    </motion.div>
+                  </AnimatePresence>
+                  <div>
+                    <span className="relative text-3xl">→</span>
+                  </div>
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={!isUserOwesMe ? "blue-left" : "blue-right"}
-                      initial={{ x: !isUserOwesMe ? -80 : 80, opacity: 0 }}
+                      initial={{ x: !isUserOwesMe ? -80 : 40, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: !isUserOwesMe ? 80 : -80, opacity: 0 }}
+                      exit={{ x: !isUserOwesMe ? 80 : -40, opacity: 0 }}
                       transition={{ duration: 0.3 }}
                       className={`absolute ${
-                        !isUserOwesMe ? "left-0" : "right-0"
-                      } w-10 h-10 bg-blue-300 rounded-full`}
-                    />
+                        !isUserOwesMe ? "left-80" : "right-80"
+                      } `}
+                    >
+                      <span>{selectedUser}</span>
+                    </motion.div>
                   </AnimatePresence>
                 </div>
 
