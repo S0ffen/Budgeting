@@ -3,7 +3,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 
 import { Transaction } from "./MainContentDemo"; // Adjust the import path as necessary
 
-import { format, set } from "date-fns";
+import { format } from "date-fns";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";

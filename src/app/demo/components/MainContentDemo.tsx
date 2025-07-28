@@ -28,14 +28,6 @@ export default function MainContentDemo({
 
   const [currency, setCurrency] = useState("USD");
 
-  const [filterMonth, setFilterMonth] = useState<number>(new Date().getMonth());
-  const [filterYear, setFilterYear] = useState<number>(
-    new Date().getFullYear()
-  );
-  const [filteredTransactions, setFilteredTransactions] = useState<
-    Transaction[]
-  >([]);
-
   // Wczytywanie zawartośći listy z localStorage
   useEffect(() => {
     if (!selectedList) return;
@@ -70,15 +62,6 @@ export default function MainContentDemo({
       console.error("Failed to load currency:", err);
     }
   }, [currency]);
-
-  // Filtrowanie transakcji wg miesiąca i roku
-  useEffect(() => {
-    const filtered = transactions.filter((tx) => {
-      const [year, month] = tx.date.split("-").map(Number);
-      return year === filterYear && month - 1 === filterMonth;
-    });
-    setFilteredTransactions(filtered);
-  }, [transactions, filterMonth, filterYear]);
 
   const addTransaction = (
     title: string,
