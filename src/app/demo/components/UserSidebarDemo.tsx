@@ -27,7 +27,6 @@ export default function UserSidebarDemo({
 }) {
   const [newListName, setNewListName] = useState("");
   const [openCreate, setOpenCreate] = useState(false);
-  const [openLogout, setOpenLogout] = useState(false);
   const user = "Sophia";
 
   const addList = (name: string) => {
@@ -55,10 +54,6 @@ export default function UserSidebarDemo({
     setOpenCreate(false);
   };
 
-  const logout = () => {
-    console.log("Użytkownik wylogowany");
-    setOpenLogout(false);
-  };
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   return (
@@ -158,34 +153,6 @@ export default function UserSidebarDemo({
               <DialogTitle>Contact Support</DialogTitle>
             </DialogHeader>
             <SupportForm />
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={openLogout} onOpenChange={setOpenLogout}>
-          <DialogTrigger asChild>
-            <button className="bg-red-100 hover:bg-red-200 text-red-800 font-medium py-2 rounded-full w-full">
-              Logout
-            </button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Are you sure you want to log out?</DialogTitle>
-            </DialogHeader>
-            <DialogFooter className="flex flex-col gap-2">
-              <Button
-                variant="ghost"
-                onClick={() => setOpenLogout(false)}
-                className="w-full"
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-red-500 hover:bg-red-600 w-full"
-                onClick={logout}
-              >
-                Logout
-              </Button>
-            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>

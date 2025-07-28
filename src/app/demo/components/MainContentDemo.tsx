@@ -4,13 +4,6 @@ import { useEffect, useState } from "react";
 import OptionsPanelDemo from "./OptionsPanelDemo";
 import InfoPanel from "./InfoPanelDemo";
 import ExpensesPanel from "./ExpensesPanelDemo";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select"; // upewnij się, że ścieżka się zgadza
 
 export interface Transaction {
   title: string;
@@ -186,30 +179,6 @@ export default function MainContentDemo({
     <section className="flex-1 p-8">
       <header className="flex flex-col gap-y-2 mb-6">
         <h2 className="text-2xl font-bold">List: {selectedList}</h2>
-        <div className="flex-col">
-          <div className="flex">
-            <span className="text-xl font-bold mr-2">Year: </span>
-            <Select>
-              <SelectTrigger className="">
-                <SelectValue placeholder="Select a Year" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="food">2024</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex">
-            <span className="text-xl font-bold mr-2">Month: </span>
-            <Select>
-              <SelectTrigger className="">
-                <SelectValue placeholder="Select a Month" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="food">January</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
       </header>
       <div className="flex border-b border-gray-300 mb-4">
         {views.map((v) => (
@@ -242,7 +211,7 @@ export default function MainContentDemo({
         />
       )}
 
-      {view === "expenses" && <ExpensesPanel />}
+      {view === "expenses" && <ExpensesPanel selectedList={selectedList} />}
 
       {view === "options" && (
         <OptionsPanelDemo
