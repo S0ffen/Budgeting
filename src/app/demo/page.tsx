@@ -18,6 +18,18 @@ export default function Demo() {
   useEffect(() => {
     const raw = localStorage.getItem("demo_lists");
     if (!raw) {
+      // Funkcja pomocnicza: zwraca datę w formacie "YYYY-MM-DD"
+      const formatDate = (date: Date) => date.toDateString();
+
+      const now = new Date();
+      const yesterday = new Date(now);
+      yesterday.setDate(now.getDate() - 1);
+
+      const twoDaysAgo = new Date(now);
+      twoDaysAgo.setDate(now.getDate() - 2);
+
+      const threeDaysAgo = new Date(now);
+      threeDaysAgo.setDate(now.getDate() - 3);
       const demoData = {
         DemoList: {
           users: ["Alice", "Bob"],
@@ -28,32 +40,32 @@ export default function Demo() {
               addedBy: "Alice",
               forUser: "Bob",
               amount: 24.5,
-              type: "REQUIREMENT",
-              date: "2025-06-01",
+              category: "food",
+              date: formatDate(now), // dzisiaj
             },
             {
               title: "Groceries",
               addedBy: "Bob",
               forUser: "Alice",
               amount: 45.0,
-              type: "REPAYMENT",
-              date: "2025-06-02",
+              category: "home",
+              date: formatDate(yesterday),
             },
             {
               title: "Taxi",
               addedBy: "Alice",
               forUser: "Alice",
               amount: 12.0,
-              type: "REQUIREMENT",
-              date: "2025-06-03",
+              category: "subscription",
+              date: formatDate(twoDaysAgo),
             },
             {
               title: "Movie tickets",
               addedBy: "Bob",
               forUser: "Bob",
               amount: 30.0,
-              type: "REQUIREMENT",
-              date: "2025-06-04",
+              category: "other",
+              date: formatDate(threeDaysAgo),
             },
           ],
         },
